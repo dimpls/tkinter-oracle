@@ -6,6 +6,7 @@ import cx_Oracle
 from tkinter import *
 from tkinter import messagebox
 
+count = 0
 update_date = 0
 tmp_select = 0
 table_selected = "Participants"
@@ -32,11 +33,18 @@ def inition(tree):
 
 
     for i in range(len(columns)):
-        tree.heading(str(columns[i]), text=str(columns[i]))
-        tree.column(str(columns[i]), width=150)
+        tree.heading(str(columns[i]), text=str(columns[i]), anchor=CENTER)
+        tree.column(str(columns[i]), width=150, anchor=CENTER)
+
+    global count
+    count = 0
 
     for row in res:
-        tree.insert("", END, values=row)
+        if count % 2 == 0:
+            tree.insert("", END, values=row, tags=('evenrow'))
+        else:
+            tree.insert("", END, values=row, tags=('oddrow'))
+        count += 1
 
 def click_button1():
     btn_delete['state'] = DISABLED
@@ -49,6 +57,7 @@ def click_button1():
 
         global tree
         tree.destroy()
+
 
         tables = ["Award", "Papers", "Participants", "Section"]
 
@@ -67,6 +76,9 @@ def click_button1():
 
         tree = tkinter.ttk.Treeview(columns=columns, show="headings", height=8)
         tree.place(x=10, y=150)
+        tree.tag_configure("oddrow", background="white")
+        tree.tag_configure("evenrow", background="lightblue")
+
         conStr = 'system/admin123@127.0.0.1/xe'
 
         conn = cx_Oracle.connect(conStr)
@@ -76,11 +88,18 @@ def click_button1():
 
 
         for i in range(len(columns)):
-            tree.heading(str(columns[i]), text=str(columns[i]))
-            tree.column(str(columns[i]), width=150)
+            tree.heading(str(columns[i]), text=str(columns[i]), anchor=CENTER)
+            tree.column(str(columns[i]), width=150, anchor=CENTER)
+
+        global count
+        count = 0
 
         for row in res:
-            tree.insert("", END, values=row)
+            if count % 2 == 0:
+                tree.insert("", END, values=row, tags=('evenrow'))
+            else:
+                tree.insert("", END, values=row, tags=('oddrow'))
+            count += 1
 
         tree.bind('<ButtonRelease-1>', unlock)
 
@@ -730,6 +749,13 @@ root.geometry('1080x480')
 root.resizable(width=False, height=False)
 tables = ["Award", "Papers", "Participants", "Section"]
 
+
+style = tkinter.ttk.Style()
+style.configure("Treeview",
+                background ="lightblue",
+                foreground ="black")
+
+
 btn1 = tkinter.ttk.Button(text="Выбрать новую таблицу", command=click_button1)
 btn1.place(x=10, y=50)
 
@@ -749,6 +775,8 @@ columns = ("ID", "FNAME", "ACADEMICDEGREE", "PLACEOFWORK", "POSITION", "CITIZENS
 tree = tkinter.ttk.Treeview(columns=columns, show="headings", height=8)
 tree.place(x=10, y=150)
 tree.bind('<ButtonRelease-1>', unlock)
+tree.tag_configure("oddrow", background="white")
+tree.tag_configure("evenrow", background="lightblue")
 inition(tree)
 
 
